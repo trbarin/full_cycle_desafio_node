@@ -1,6 +1,6 @@
 version: '3'
 
-services: 
+services:
 
   nginx:
     build:
@@ -15,19 +15,20 @@ services:
       - app
 
   app:
-    build: 
+    build:
       context: ./node
     image: thiagorb/node
     container_name: app
     entrypoint: dockerize -wait tcp://db:3306 -timeout 20s docker-entrypoint.sh
     command: "node index.js"
-    networks: 
+    networks:
       - node-network
-    volumes: 
+    volumes:
       - ./node:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
     tty: true
-    depends_on: 
-       - db
+    depends_on:
+      - db
 
   db:
     image: mysql:5.7
@@ -35,14 +36,17 @@ services:
     container_name: db
     restart: always
     tty: true
-    volumes: 
+    volumes:
       - ./mysql:/var/lib/mysql
-    environment: 
+    environment:
       - MYSQL_DATABASE=nodedb
       - MYSQL_ROOT_PASSWORD=root
-    networks: 
+    networks:
       - node-network
 
-networks: 
+networks:
   node-network:
-    driver: bridge   
+    driver: bridge
+
+volumes:
+  node_modules:
